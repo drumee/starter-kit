@@ -1,0 +1,12 @@
+{
+  "name": "@drumee/starter-kit-configure",
+  "version": "0.0.0",
+  "description": "Drumee Starter Kit conf generator",
+  "author": "Somanos Sar <somanos@drumee.com>",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "argparse": "^2.0.1",
+    "jsonfile": "^6.1.0"
+  }
+}

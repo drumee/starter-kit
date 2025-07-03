@@ -134,3 +134,12 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+static/
+runtime/
+plugins/
+drumee-os/
+storage/
+setup
+docker.yaml
+start.d/.dev-tools-rc/

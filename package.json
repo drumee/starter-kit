@@ -1,0 +1,17 @@
+{
+  "name": "@drumee/starter-kit",
+  "version": "1.0.15",
+  "description": "Drumee Delevopers Starter Kit",
+  "scripts": {
+    "configure": "node configure --http-port=8080 --https-port=4443 && chmod +x setup && ./setup"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:drumee/starter-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/drumee/starter-kit/issues"
+  },
+  "author": "Somanos Sar <somanos@drumee.com>",
+  "license": "MIT"
+}

@@ -1,0 +1,18 @@
+#!/bin/bash
+# This script in intended to run within container
+set -e
+script_dir=$(dirname $(readlink -f $0))
+
+if [ -f /etc/drumee/drumee.sh ]; then
+  echo Drumee infrastructure is already configured
+  exit 0
+fi
+
+
+cd $script_dir
+db_dir=/var/lib/drumee/db
+data_dir=/var/lib/drumee/data
+node node_modules/@drumee/setup-infra/index.js --localhost=1 --db-dir=$db_dir --data-dir=$data_dir
+
+schemas/populate
+node schemas/index.js 

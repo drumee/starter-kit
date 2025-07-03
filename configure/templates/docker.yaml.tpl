@@ -1,0 +1,21 @@
+
+services:
+  drumee:
+    hostname: <%= hostname %>
+    container_name: <%= container_name %> 
+    image: drumee/starter-kit:latest
+    ports:   
+      - "<%= http_port %>:443/tcp"
+      - "<%= https_port %>:80/tcp"
+
+    volumes:
+      - <%= storage_dir %>/db:/var/lib/drumee/db
+      - <%= storage_dir %>/data:/var/lib/drumee/data
+      - <%= src_dir %>/runtime:/var/lib/drumee/runtime
+      - <%= src_dir %>/plugins:/var/lib/drumee/plugins
+      - <%= src_dir %>/start.d:/var/lib/drumee/start.d
+      - <%= src_dir %>/static:/var/lib/drumee/static:ro
+      - <%= share_home %>
+    entrypoint: /bin/bash 
+    stdin_open: true 
+    tty: true 
