@@ -1,0 +1,36 @@
+#!/bin/bash
+# This script in intended to run within container
+set -e
+script_dir=$(dirname $(readlink -f $0))
+envfile=/etc/drumee/drumee.sh
+
+if [ "$USER" = "" ];then
+  export USER=$(whoami)
+fi
+
+start_daemons() {
+  source $envfile 
+  service mariadb start
+  service nginx start
+  service redis-server start
+  pm2 restart $DRUMEE_SERVER_HOME/ecosystem.config.js
+}
+
+if [ -f $envfile ]; then
+  echo Drumee is already configured. Staring daemons
+  start_daemons
+  exit 0
+fi
+
+cd $script_dir
+node setup-infra/index.js --localhost=1 --db-dir=/var/lib/drumee/db --reconfigure=1 --system-user=$USER
+
+if [ -f $envfile ]; then
+  source $envfile 
+  mkdir -p $DRUMEE_DB_DIR/run
+  schemas/populate
+  node schemas/index.js
+  start_daemons
+else
+  echo "Could not start Drumee. $envfile not found"
+fi

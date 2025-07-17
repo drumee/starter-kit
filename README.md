@@ -84,21 +84,77 @@ Follow these steps to set up and install the Drumee Starter Kit on your local ma
 1.  **Clone the repository:**
 
     ```bash
-    git clone https://github.com/your-username/drumee-starter-kit.git
-    cd drumee-starter-kit
+    git clone https://github.com/drumee/starter-kit.git
     ```
-
-    *(Note: Replace `https://github.com/your-username/drumee-starter-kit.git` with the actual repository URL once it's created.)*
 
 2.  **General Setup:**
 
-    Navigate to the `server` directory and install the dependencies:
-
+    Get into the repo and run auto conigure script
     ```bash
+    cd drumee-starter-kit
     npm run configure
     ```
 
-    After installation, a directory named .dev-tools.rc will automatically created. 
+The conifigurator will setup the project structure as below:
+```
+.
+├── configure /* Drumee OS auto configuration module */
+│   └── templates
+│       ├── drumee-rc
+│       └── start.d
+├── drumee-os /* Drumee OS Source. Upon build, results are synced to runtime dir */
+│   ├── server-team
+│   │   ├── acl
+│   │   ├── client
+│   │   ├── docs
+│   │   ├── offline
+│   │   ├── router
+│   │   └── service
+│   ├── static
+│   │   ├── dataset
+│   │   ├── docs
+│   │   ├── flags
+│   │   ├── fonts
+│   │   ├── icons
+│   │   ├── images
+│   │   ├── locale
+│   │   ├── musics
+│   │   ├── sample
+│   │   └── styles
+│   └── ui-team
+│       ├── bb-templates
+│       ├── docs
+│       ├── icons
+│       ├── letc
+│       ├── locale
+│       ├── src
+│       ├── svg
+│       ├── @types
+│       └── webpack
+├── node_modules
+│   ├── ...
+│   └── ...
+├── plugins
+│   ├── ... /* Your Plugins code here */
+│   └── ...
+├── runtime
+│   ├── ui
+│   ├── server
+│   └── tmp
+├── start.d /* Modules to be used from within the container */
+│   ├── node_modules
+│   └── schemas
+├── storage
+│   ├── data
+│   │   └── mfs  /* Drumee Filesystem Storage */
+│   └── db       /* Drumee Database Storage */
+│       ├── mysql
+│       ├── performance_schema
+│       ├── run
+│       ├── sys
+│       └── test
+└── tmp
+```
 
     Open the newly created `.dev-tools.rc/devel.sh` file and configure the necessary environment variables. 
 

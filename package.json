@@ -13,5 +13,9 @@
     "url": "https://github.com/drumee/starter-kit/issues"
   },
   "author": "Somanos Sar <somanos@drumee.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@drumee/server-essentials": "^1.1.32",
+    "@drumee/setup-infra": "^1.0.14"
+  }
 }

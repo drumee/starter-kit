@@ -1,0 +1,60 @@
+#!/bin/bash
+set -e
+script_dir=$(dirname $(readlink -f $0))
+cd $script_dir
+if [ -f /etc/drumee/drumee.sh ]; then
+  source /etc/drumee/drumee.sh
+  app_user=$DRUMEE_SYSTEM_USER
+else
+  echo Looks like Drumee infrastructure is not yet configured
+  exit 1
+fi
+
+if [ -d $db_dir/run/performance_schema ]; then
+  echo Drumee databse is already configured
+else
+  mysql_dir=/var/log/mysql
+  mkdir -p $mysql_dir
+  touch $mysql_dir/error.log
+  chown -R mysql:mysql $mysql_dir
+  mkdir -p $DRUMEE_DB_DIR/run
+  rsync -ravp /var/lib/mysql/ $DRUMEE_DB_DIR/run/
+  chown mysql:mysql $DRUMEE_DB_DIR
+fi
+
+#Ensure db server to log here, whatever OS log style
+
+service mariadb start
+
+exists=$(mariadb -e "SHOW GRANTS FOR '$app_user'@'localhost';"| grep unix_socket | tail -1)
+if [ "$exists" = "" ]; then
+  echo Creating DB USER "'$app_user'@'localhost'"
+  mariadb -e "CREATE OR REPLACE USER '$app_user'@'localhost' IDENTIFIED VIA unix_socket"
+  mariadb -e "GRANT ALL PRIVILEGES ON *.* TO '$app_user'@'localhost'"
+else
+  echo $app_user already exists, skipped
+fi
+
+collation=$(mariadb -e "show variables like 'character_set_collations';"|tail -1)
+if [ "$collation" != "" ]; then
+  mariadb -e "set GLOBAL character_set_collations='utf8mb4=utf8mb4_general_ci'"
+fi
+
+cd templates/seed
+for file in $(ls *.sql); do
+  db_name=$(echo $file | sed -E "s/\.sql$//")
+  echo Populating $db_name
+  mariadb -e "DROP DATABASE IF EXISTS ${db_name}" 
+  mariadb -e "CREATE database ${db_name}" 
+  mariadb -e "ALTER DATABASE ${db_name} COLLATE 'utf8mb4_general_ci'"
+  mariadb $db_name < $file
+  # out=$(mariadb -e "SHOW databases like '${db_name}'" | tail -1)
+  # if [ "$out" = "" ]; then
+  #   echo Polutating $db_name
+  #   mariadb -e "CREATE database ${db_name}" 
+  #   mariadb -e "ALTER DATABASE ${db_name} COLLATE 'utf8mb4_general_ci'"
+  #   mariadb $db_name < $file
+  # else
+  #   echo $db_name already exists, skipped
+  # fi
+done

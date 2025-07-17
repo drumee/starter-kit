@@ -6,7 +6,9 @@
   "license": "MIT",
   "main": "index.js",
   "dependencies": {
+    "@drumee/setup-infra": "^1.0.14",
     "argparse": "^2.0.1",
-    "jsonfile": "^6.1.0"
+    "jsonfile": "^6.1.0",
+    "lodash": "^4.17.21"
   }
 }

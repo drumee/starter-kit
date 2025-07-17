@@ -272,7 +272,7 @@ async function main() {
     {
       template: resolve(base, 'drumee-rc/ui-team/.dev-tools.rc/deploy.sh'),
       outfile: resolve(src_dir, 'drumee-os/ui-team/.dev-tools.rc/deploy.sh')
-    },
+    }
   ]
   writeTemplates(data, opt)
 }
