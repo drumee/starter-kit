@@ -1,0 +1,35 @@
+{
+  "name": "@drumee/configure",
+  "version": "0.0.0",
+  "description": "Drumee Delevopers Starter Kit - configure docker",
+  "scripts": {
+    "configure.infra": "node node_modules/setup-infra/index.js --localhost=1 --db-dir=/var/lib/drumee/db --reconfigure=1 --watch-dirs=/var/lib/drumee/runtime/server,/var/lib/drumee/runtime/ui",
+    "configure.schemas": "source /etc/drumee/drumee.sh",
+    "log.service": "docker exec -it starter-kit pm2 log main/service",
+    "log.page": "docker exec -it starter-kit  pm2 log main"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:drumee/starter-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/drumee/starter-kit/issues"
+  },
+  "author": "Somanos Sar <somanos@drumee.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@drumee/server-core": "^1.1.20",
+    "@drumee/server-dev-tools": "^1.1.20",
+    "@drumee/server-essentials": "^1.1.32",
+    "@drumee/setup-infra": "^1.0.15",
+    "@drumee/setup-schemas": "^1.0.14",
+    "check-disk-space": "^3.4.0",
+    "crypto": "^1.0.1",
+    "jsonfile": "^5.0.0",
+    "lodash": "^4.17.21",
+    "mariadb": "^3.0.2",
+    "punycode": "^2.3.1",
+    "shelljs": "^0.8.5",
+    "unique-names-generator": "^4.7.1"
+  }
+}

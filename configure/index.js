@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 
-const { join, resolve, dirname } = require("path");
+const { resolve, dirname } = require("path");
 const { isString, isEmpty, template } = require("lodash");
 const { exit } = process;
-// const { loadSysEnv, sysEnv, uniqueId } = require("@drumee/server-essentials");
-const { totalmem, userInfo } = require('os');
 const {
   existsSync, close, writeSync, openSync, readFileSync, mkdirSync
 } = require("fs");
@@ -110,17 +108,17 @@ parser.add_argument("--storage-dir", {
   help: "Partition or directory dedicated to store drumee filesystem and databases",
 });
 
-// parser.add_argument("--data-dir", {
-//   type: String,
-//   default: 'storage/data',
-//   help: "Partition or directory dedicated to store drumee data",
-// });
+parser.add_argument("--uid", {
+  type: "int",
+  default: null,
+  help: "Container UID",
+});
 
-// parser.add_argument("--db-dir", {
-//   type: String,
-//   default: 'storage/db',
-//   help: "Partition or directory dedicated to store drumee database",
-// });
+parser.add_argument("--gid", {
+  type: "int",
+  default: null,
+  help: "Container GID",
+});
 
 parser.add_argument("--share-home", {
   type: 'int',
@@ -232,7 +230,7 @@ function writeTemplates(data, targets) {
  */
 async function main() {
   const os = require('os')
-  const { homedir } = os.userInfo()
+  const { homedir, uid, gid} = os.userInfo()
   const env_root = args.outdir || args.chroot;
   let src_dir = resolve(__dirname, '..')
   let data = {
@@ -246,6 +244,12 @@ async function main() {
   }
   if (args.share_home) {
     data.share_home = `${homedir}:${homedir}:ro`
+  }
+  if (!args.uid) {
+    data.uid = uid
+  }
+  if (!args.gid) {
+    data.gid = gid
   }
   let base = 'configure/templates'
   let opt = [
@@ -272,7 +276,11 @@ async function main() {
     {
       template: resolve(base, 'drumee-rc/ui-team/.dev-tools.rc/deploy.sh'),
       outfile: resolve(src_dir, 'drumee-os/ui-team/.dev-tools.rc/deploy.sh')
-    }
+    },
+    // {
+    //   template: resolve(base, 'container.d/start'),
+    //   outfile: resolve(src_dir, 'container.d/start')
+    // },
   ]
   writeTemplates(data, opt)
 }

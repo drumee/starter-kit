@@ -155,6 +155,30 @@ parser.add_argument("--system-group", {
   help: "System group used to run Drumee",
 });
 
+parser.add_argument("--watch-dirs", {
+  type: String,
+  default: null,
+  help: "pm2 watch directories",
+});
+
+parser.add_argument("--watch-delay", {
+  type: 'int',
+  default: 1000,
+  help: "pm2 watch delay",
+});
+
+parser.add_argument("--watch-symlinks", {
+  type: 'int',
+  default: 0,
+  help: "pm2 watch delay",
+});
+
+parser.add_argument("--watch-ignore", {
+  type: String,
+  default: null,
+  help: "pm2 ignore directories",
+});
+
 parser.add_argument("--drumee-root", {
   type: String,
   default: DRUMEE_ROOT || "/var/lib/drumee",

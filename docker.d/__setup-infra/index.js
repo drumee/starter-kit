@@ -101,7 +101,7 @@ function worker(data, instances = 1, exec_mode = 'fork_mode') {
   if (!server_dir) server_dir = join(runtime_dir, 'server');
   let base = `${server_dir}/${route}`;
   let iname = name.replace('/', '-');
-  return {
+  let opt = {
     name,
     script,
     cwd: base,
@@ -124,6 +124,30 @@ function worker(data, instances = 1, exec_mode = 'fork_mode') {
       retain: 30 // Keep 30 rotated logs
     }
   };
+  if (args.watch_dirs) {
+    let dirs = args.watch_dirs.split(/,+/);
+    if (dirs.length) {
+      opt.watch = dirs;
+      opt.watch_delay = args.watch_delay;
+      if (args.watch_symlinks) {
+        opt.watch_options = {
+          followSymlinks: true
+        }
+      } else {
+        opt.watch_options = {
+          followSymlinks: false
+        }
+      }
+      if (args.watch_ignore) {
+        let ignored = args.watch_ignore.split(/,+/);
+        if (ignored.length) {
+          opt.ignore_watch = ignored;
+        }
+      }
+    }
+  }
+  return opt;
+
 }
 
 /***

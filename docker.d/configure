@@ -1,0 +1,37 @@
+#!/bin/bash
+# This script in intended to run within container
+set -e
+script_dir=$(dirname $(readlink -f $0))
+envfile=/etc/drumee/drumee.sh
+
+cd $script_dir
+npm i
+
+watch_dirs=/var/lib/drumee/runtime/server,/var/lib/drumee/runtime/ui
+node node_modules/setup-infra/index.js --localhost=1 --db-dir=/var/lib/drumee/db --reconfigure=1 \
+  --watch-dirs=$watch_dirs
+
+if [ -f $envfile ]; then
+  source $envfile 
+else
+  echo "Could not start Drumee. $envfile not found"
+fi
+
+if [ ! -d $DRUMEE_DATA_DIR ]; then
+  echo Data dir $DRUMEE_DATA_DIR not found.
+  exit 1
+fi 
+
+data_owner=$(stat -c '%U' $DRUMEE_DATA_DIR)
+if [ "$DRUMEE_SYSTEM_USER" != "$data_owner" ]; then
+  chown -R $DRUMEE_SYSTEM_USER:$DRUMEE_SYSTEM_GROUP $DRUMEE_DATA_DIR
+fi
+
+data_owner=$(stat -c '%U' $DRUMEE_RUNTIME_DIR/tmp)
+if [ "$DRUMEE_SYSTEM_USER" != "$data_owner" ]; then
+  chown -R $DRUMEE_SYSTEM_USER:$DRUMEE_SYSTEM_GROUP $DRUMEE_RUNTIME_DIR/tmp
+fi
+
+mkdir -p $DRUMEE_DB_DIR/run
+schemas/populate
+node schemas/index.js
