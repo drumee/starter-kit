@@ -1,6 +1,8 @@
 # Drumee Starter Kit
 
-This starter kit provides a basic application built with the Drumee framework, demonstrating how to integrate backend and frontend components. It aims to help developers quickly get started with Drumee development.
+This starter kit provides a basic application built with the Drumee framework, demonstrating how to integrate backend and frontend components. It aims to help developers quickly get started with Drumee development. It is not intended to be deployed on production, as it has been designed to run on a simplified environment, i.e localhost.
+
+If you need to production ready installation, head to this page.
 
 ## Table of Contents
 
@@ -11,8 +13,6 @@ This starter kit provides a basic application built with the Drumee framework, d
 - [Running the Application](#running-the-application)
 - [Backend Overview](#backend-overview)
 - [Frontend Overview](#frontend-overview)
-- [Configuration](#configuration)
-- [Deployment](#deployment)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 - [License](#license)
@@ -23,24 +23,6 @@ This starter kit provides a basic application built with the Drumee framework, d
 
 Drumee is an OS-like full-stack framework designed to simplify development by providing a single bundle, easy deployment, and a low learning curve SDK. This starter kit showcases a simple application that leverages Drumee's backend and frontend capabilities, allowing you to explore its features and build your own applications.
 
-For now, Drumee server is available on Debian and derivatives Distribution only. Nerverthless, being a web application, Drumee clients are obviously available on any platforms with modern browsers. A Desktop is also available.
-
-## Dependencies
-- Debian 11 or higher
-- nginx
-- mariadb
-- prosody
-- jitsi-meet
-- nodejs
-- bind9
-- graphicsmagick
-- ffmpeg
-- redis
-- libreoffice
-- postfix
-- opendkim
-
-This starter kit comes with installation scripts that will install automatically thes depencies.
 
 ## Prerequisites
 
@@ -51,247 +33,131 @@ Before you begin, ensure you can comply to following requirements:
 - CPU at leat 2 GHz
 - Enough space to host what you need
 
-### Drumee OS 
-To use the Starter Kit, you need to install Drumee OS by following one of below methods. Each has different requirements and purposes.
+### Software
+To avoid polluting your environment, this starter kit comes with a Docker image that already provides all dependencies. 
+- Dokcer (28 or gigher)
+- nodejs (22 or gigher)
 
-#### Installation on a public domain, reachable world wide
-This installation mode is intended for production deployment on public internet domain, you will need to fulfill following requirements.
-- A maiden Internet domain name
-- Control Access to your DNS zone
-- Control Access to your GLU DNS
-- At least one Public IP addresses, IPV4 and/or IPV6
+If you don't have already Docker installed, please head to the [official installation guide](https://docs.docker.com/engine/install/debian/)
 
-**Caution: The provided domain name can not be shared with existing or futur application. It is recommanded not to share DB server with any other application**
-Go to this link to poceed to the public domain installation.
-
-#### Installation on a private domain, reachable only from your local network
-This installation mode may be used as production or developement plateform on your private network, you will need to fulfill following requirements.
-- Change local clients DNS resolvers to add Drumee Server as its own domain name server
-
-**Caution: It is recommanded not to share DB server with any other application**
-Go to this link to poceed to the public domain installation.
-
-#### Installation on your local host
-This installation mode is inteded for develpment purpose only. Some funcintionalities such as video conference may not work properly.
-Work in progress. Contributors are welcomed to npmify Drumee OS. The aim is to reduce installtion process into npm -g drumee-os.
+If you don't have already Nodejs installed, please follow (installation guide here)[https://nodejs.org/en/download/]
 
 
+# Project Structure
 
-## Setup and Installation
-Ensure you have installed Drumee OS, as described earlier in ## Prerequisites section.
-Follow these steps to set up and install the Drumee Starter Kit on your local machine:
-
-1.  **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/drumee/starter-kit.git
-    ```
-
-2.  **General Setup:**
-
-    Get into the repo and run auto conigure script
-    ```bash
-    cd drumee-starter-kit
-    npm run configure
-    ```
-
-The conifigurator will setup the project structure as below:
 ```
 .
-├── configure /* Drumee OS auto configuration module */
-│   └── templates
-│       ├── drumee-rc
-│       └── start.d
-├── drumee-os /* Drumee OS Source. Upon build, results are synced to runtime dir */
+├── bin              /** Shell scripts required by backend **/
+│   └── ...
+├── configure        /** Prepare the installation environment **/
+│   └── ...
+├── docker.d         /** Starter scripts for docker **/
+│   └── ...
+├── docker.yaml      /** Automatically generated. Do not change **/
+├── drumee-os        /** Drumee OS sources. Use npm  run dev to make changes updated on the server **/
 │   ├── server-team
-│   │   ├── acl
-│   │   ├── client
-│   │   ├── docs
-│   │   ├── offline
-│   │   ├── router
-│   │   └── service
-│   ├── static
-│   │   ├── dataset
-│   │   ├── docs
-│   │   ├── flags
-│   │   ├── fonts
-│   │   ├── icons
-│   │   ├── images
-│   │   ├── locale
-│   │   ├── musics
-│   │   ├── sample
-│   │   └── styles
 │   └── ui-team
-│       ├── bb-templates
-│       ├── docs
-│       ├── icons
-│       ├── letc
-│       ├── locale
-│       ├── src
-│       ├── svg
-│       ├── @types
-│       └── webpack
+├── LICENSE
 ├── node_modules
 │   ├── ...
 │   └── ...
-├── plugins
-│   ├── ... /* Your Plugins code here */
-│   └── ...
-├── runtime
-│   ├── ui
+├── plugins          /** Plugins. **/
+├── runtime          /** Drumee runtime directories (backend and frontend builds) **/
 │   ├── server
-│   └── tmp
-├── start.d /* Modules to be used from within the container */
-│   ├── node_modules
-│   └── schemas
-├── storage
+│   ├── static
+│   ├── tmp
+│   └── ui
+├── setup            /** Automatically generated. Do not change **/
+├── storage          /** Drumee storage directories (db + meta file system) **/
 │   ├── data
-│   │   └── mfs  /* Drumee Filesystem Storage */
-│   └── db       /* Drumee Database Storage */
-│       ├── mysql
-│       ├── performance_schema
-│       ├── run
-│       ├── sys
-│       └── test
-└── tmp
+│   └── db
+└── tree.md          /** This file **/
 ```
 
-    Open the newly created `.dev-tools.rc/devel.sh` file and configure the necessary environment variables. 
 
-3.  **Frontend Setup:**
+# Setup and Installation
 
-    Navigate to the `ui` directory and install the dependencies:
+Get the Drumee Starter Kit, this project.
 
-    ```bash
-    cd ../ui
-    npm install
-    ```
-    Open the file `webpack.options.json` file and configure the necessary environment variables. 
-
-
-
-## Running the Application
-
-Once both the backend and frontend dependencies are installed and configured, you can run the application:
-
-1.  **Start the Backend Server:**
-
-    From the `backend` directory, run:
-
-    ```bash
-    npm start
-    ```
-
-    This will start the Drumee backend server, typically on `http://localhost:3000` (or the port specified in your backend `.env` file).
-
-2.  **Start the Frontend Application:**
-
-    From the `frontend` directory, run:
-
-    ```bash
-    npm start
-    ```
-
-    This will launch the React development server, usually opening the application in your browser at `http://localhost:3001` (or the port specified in your frontend `.env` file).
-
-    You should now be able to interact with the Drumee starter application in your web browser.
-
-
-
-
-## Backend Overview
-
-The `backend` directory contains a Node.js application that serves as the API for the Drumee starter kit. It leverages the following core Drumee modules:
-
-*   **`@drumee/server-team`**: This package provides Drumee Team Services API, offering functionalities like identity management (yellow page) and filesystem management. It also supports open or closed groups, and integrates Jitsi and chat features [2].
-*   **`@drumee/server-essentials`**: These are essential modules required to run every Drumee backend component. They provide foundational functionalities for the Drumee ecosystem [3].
-*   **`@drumee/server-core`**: This module contains the core library to run every Drumee Backend Services and Drumee Server Common Library [4].
-
-The `backend/src/app.js` file will contain a basic example of how to define API routes and interact with Drumee's backend services. A simple CRUD (Create, Read, Update, Delete) example will be provided to demonstrate data interaction.
-
-
-
-
-## Frontend Overview
-
-The `frontend` directory hosts a React application that consumes the APIs exposed by the Drumee backend. It utilizes the `@drumee/ui-team` for building the user interface. The `ui-team` repository, while currently lacking a detailed README, is expected to provide components and utilities for building Drumee-compatible user interfaces [5].
-
-The `frontend/src/App.js` and `frontend/src/index.js` files will demonstrate how to make API calls to the backend and render data within a React component. A simple user interface will be provided to interact with the CRUD example implemented in the backend.
-
-
-
-
-## Configuration
-
-Both the backend and frontend applications rely on environment variables for configuration. These variables are loaded from `.env` files located in their respective directories (`backend/.env` and `frontend/.env`).
-
-**Backend Configuration (`backend/.env`):
-
-```ini
-# Example environment variables for the backend
-PORT=3000
-DB_HOST=localhost
-DB_USER=drumee_user
-DB_PASSWORD=drumee_password
-DB_NAME=drumee_db
-# Add any other backend-specific configurations here
+```
+  git clone https://github.com/drumee/starter-kit.git
 ```
 
-**Frontend Configuration (`frontend/.env`):
+After download completed, navigate into the starter-kit and run auto configuration
 
-```ini
-# Example environment variables for the frontend
-REACT_APP_API_URL=http://localhost:3000
-# Add any other frontend-specific configurations here
+```
+  cd starter-kit 
+  npm run configure
 ```
 
-**Important:**
+The configuration utilities will create files, directories and install packages required to run Drumee OS. Plrease refer to the [Project Structure](#project-structure) to have an overview of each directory role. 
 
-*   Never commit your `.env` files to version control. The `.gitignore` file is already configured to ignore these files.
-*   The `.env.example` files serve as templates, outlining the required environment variables. Copy them to `.env` and fill in your specific values.
+After the configuration completion, run. 
+
+```
+  npm run server.configure
+
+```
+
+The above command will configure the Docker container intended to host the Drumee Server. This command needs to be executed only once. At this step,your Drumee environment is ready.
 
 
+# Running the Application
+
+ After the server setup is sucessfully completed, start Drumee Server.
+
+```
+  npm run server.start
+```
+
+Set the admin password. Open the file storage/data/tmp/welcome.html and click on the link. Once the password set, the link is no more valid. If you want to change the password again, use the Drumee User Interface to do it.
 
 
-## Deployment
+# Backend Overview
 
-This starter kit can be deployed in various ways, depending on your infrastructure and preferences. Here, we outline two common approaches:
+Drumee is a pure client-side rendering application. There no code in the backend dedicated to handle frontend interaction. Backend source is installed in drumee-os/server-team. You can try changes on the backend with bellow command. 
 
-### 1. Bare Metal / Virtual Machine Deployment (Debian-based)
+```
+  cd drumee-os/server-team 
+  npm run dev
+```
 
-For deploying on a bare metal server or virtual machine running Debian 11 or higher, you can leverage the `debian-hosted` repository provided by Drumee [1]. This repository contains scripts and configurations for setting up the necessary dependencies (nginx, mariadb, prosody, jitsi-meet, nodejs, bind9, graphicsmagick, ffmpeg, redis, libreoffice, postfix, opendkim) and installing Drumee.
+Changes on files from this directory will be synced to runtime/server/main and the server will automaticall restart.
 
-**Steps:**
+Drumee backend is made of 3 processes, all managed through pm2.
+To see all backend processes 
 
-1.  **Prepare your Debian server:** Ensure your server meets the minimum requirements (8GB RAM, 2GHz CPU, sufficient disk space) and has a dedicated domain name with controlled DNS access.
-2.  **Configure DNS:** Update your DNS zone with the A and AAAA records pointing to your server's IP addresses, as described in the `debian-hosted` README [1].
-3.  **Clone `debian-hosted`:**
+```
+  npm run server.list
+```
 
-    ```bash
-    git clone https://github.com/drumee/debian-hosted.git
-    cd debian-hosted
-    ```
+The *process* factory is a background one, it's dedicated to pre-build Databases Schemas, which are store in a pool for dynamic allocation.
 
-4.  **Configure `drumee.sh`:** Copy `env.sh` to `drumee.sh` and edit `drumee.sh` to match your server's configuration and domain name.
-5.  **Run the installer:** Execute the `./install` script as a root user.
-6.  **Deploy the starter kit:** After Drumee is installed, you can deploy your backend and frontend applications to the appropriate directories on your server. The `scripts/deploy.sh` in this starter kit will provide an example of how to automate this process.
+The *main* is dedicated to serve the application loader and maintain websocket connection with client-side
 
-### 2. Docker Deployment
+The *main/service* is a micro services runner. See files in drumee-os/server-team/acl to explorer all availables services.
 
-For a more containerized approach, you can use Docker. Drumee provides Docker images that simplify the deployment process. Refer to the Drumee documentation for details on installing Drumee Docker Image [2].
+To see backend main process log. 
 
-**Steps:**
+```
+  npm run log.main
+```
 
-1.  **Install Docker:** Ensure Docker and Docker Compose are installed on your deployment environment.
-2.  **Build Docker images:** Create Dockerfiles for your backend and frontend applications within this starter kit. These Dockerfiles will build images containing your application code and dependencies.
-3.  **Docker Compose:** Use Docker Compose to define and run your multi-container Drumee application. A `docker-compose.yml` file will orchestrate the backend, frontend, and any necessary Drumee services.
-4.  **Run Docker Compose:**
+To see backend services process log. 
 
-    ```bash
-    docker-compose up -d
-    ```
+```
+  npm run log.service
+```
 
-    This will start all services defined in your `docker-compose.yml` in detached mode.
+# Frontend Overview
+Drumee is a pure client-side rendering application. The whole user interface is fully handled on the clien-side.Frontend source is installed in drumee-os/ui-team. You can try changes on the frontend with bellow command.
+
+```
+  cd drumee-os/ui-team 
+  npm run dev
+```
+
+Changes on files from this directory will be bundle into runtime/ui/main the server will automaticall restart.
 
 
 

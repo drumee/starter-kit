@@ -138,6 +138,7 @@ dist
 static/
 runtime/
 plugins/
+log/
 drumee-os/
 storage/
 setup
