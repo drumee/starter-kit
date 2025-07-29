@@ -2,11 +2,50 @@
 const { join } = require("path");
 const { exit } = process;
 
-const { sysEnv, subtleCrypto, Cache, Mariadb, uniqueId } = require("@drumee/server-essentials");
+const { sysEnv, subtleCrypto, Cache, Mariadb, Template} = require("@drumee/server-essentials");
+const CREDENTIAL_DIR = "/etc/drumee/credential";
+const publicKeyFile = join(CREDENTIAL_DIR, "crypto/public.pem");
+const privateKeyFile = join(CREDENTIAL_DIR, "crypto/private.pem");
 
 const Schema = require('./schema')
-const { Organization, Drumate, Mfs } = require("@drumee/setup-schemas");
+const { Organization, Mfs } = require("@drumee/setup-schemas");
 
+
+const argparse = require("argparse");
+const {
+  PRIVATE_DOMAIN,
+  PRIVATE_IP4,
+  PUBLIC_DOMAIN,
+  PUBLIC_IP4,
+  PUBLIC_IP6,
+} = process.env;
+
+const parser = new argparse.ArgumentParser({
+  description: "Drumee Starter Kit",
+  add_help: true,
+});
+
+
+parser.add_argument("--localhost", {
+  type: "int",
+  default: 0,
+  help: "If set, write minimal configs, no jitsi, no bind",
+});
+
+parser.add_argument("--http-port", {
+  type: "int",
+  default: 80,
+  help: "If set, write minimal configs, no jitsi, no bind",
+});
+
+parser.add_argument("--https-port", {
+  type: "int",
+  default: 443,
+  help: "If set, write minimal configs, no jitsi, no bind",
+});
+
+
+const args = parser.parse_args();
 
 const yp = new Mariadb({ name: 'yp' });
 /**
@@ -59,10 +98,8 @@ async function afterInstall(link, domain) {
   writeFileSync(publicKeyFile, publicKey);
   writeFileSync(privateKeyFile, privateKey);
   let out = join(data_dir, 'tmp', "welcome.html");
-  let tpl = join(__dirname, 'asset', "welcome.html");
-  console.log(`Cteating welcome file into ${out}`);
+  let tpl = join(__dirname, 'templates', "welcome.html");
   Template.write({ link, domain }, { tpl, out });
-  console.log("Congratulation! Your Drumee Starter Kit is ready. Open the link")
 }
 
 /**
@@ -71,7 +108,7 @@ async function afterInstall(link, domain) {
 async function start() {
   new Cache();
   await Cache.load();
-  const org = new Organization();
+  const org = new Organization(args);
   await org.populate();
   for (let i = 0; i < 6; i++) {
     await make_schema('drumate')
@@ -90,6 +127,14 @@ async function start() {
   await mfs.importTutorial();
   // /* TO DO: import or create robot.txt */
   await afterInstall(reset_link, domain)
+  console.log(`
+     **************************************************************************
+    * Congratulation! Your Drumee Starter Kit is ready!
+    * Start Drumee Server with command **npm run server.start**
+    * Server started. Click on the link below to set you admin password
+    * <a href="${reset_link}">Open this link to set the admin password</a>
+     **************************************************************************
+  `)
 }
 
 start()

@@ -1,1 +1,0 @@
-mail._domainkey.<%= domain %> <%= domain %>:mail:/etc/opendkim/keys/<%= domain %>/private.pem

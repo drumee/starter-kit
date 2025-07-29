@@ -1,0 +1,19 @@
+{
+  "name": "@drumee/starter-kit",
+  "version": "0.0.0",
+  "description": "Drumee Delevopers Starter Kit",
+  "scripts": {
+    "configure": "node setup-infra/index.js --localhost=1 --db-dir=/var/lib/drumee/db --reconfigure=1",
+    "log.service":"docker exec -it starter-kit pm2 log main/service",
+    "log.page":"docker exec -it starter-kit  pm2 log main"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:drumee/starter-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/drumee/starter-kit/issues"
+  },
+  "author": "Somanos Sar <somanos@drumee.com>",
+  "license": "MIT"
+}

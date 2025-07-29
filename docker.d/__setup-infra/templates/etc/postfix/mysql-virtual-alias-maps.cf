@@ -1,5 +1,0 @@
-user = <%= mail_user %>
-password = <%= mail_password %>
-hosts = 127.0.0.1
-dbname = mailserver
-query = SELECT destination FROM aliases WHERE source='%s'

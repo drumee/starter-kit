@@ -19,10 +19,17 @@ for package in server-team ui-team; do
   fi
 done
 
-cd $script_dir/drumee-os/server-team && npm i
-cd $script_dir/drumee-os/ui-team && npm i
-cd $script_dir/drumee-os/server-team && npm run deploy
-cd $script_dir/drumee-os/ui-team && npm run deploy
+if [ -d $script_dir/drumee-os/tmp ]; then
+  cd $script_dir/drumee-os/server-team
+  mv ../tmp/server-team/.dev-tools.rc .
+  npm i && npm run deploy
+
+  cd $script_dir/drumee-os/ui-team
+  mv ../tmp/ui-team/.dev-tools.rc .
+  npm i && npm run deploy
+
+  rm -rf $script_dir/drumee-os/tmp
+fi
 
 # Drumee Data directories
 mkdir -p <%= storage_dir %>/db
@@ -36,5 +43,6 @@ else
   git clone https://github.com/drumee/static.git
 fi
 
+mkdir -p <%= src_dir %>/runtime/tmp
 docker compose -f $script_dir/docker.yaml up -d
 #docker exec -it starter-kit bash

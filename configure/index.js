@@ -15,9 +15,6 @@ const {
   PUBLIC_DOMAIN,
   PUBLIC_IP4,
   PUBLIC_IP6,
-  HTTP_PORT,
-  HTTPS_PORT,
-  FORCE_INSTALL,
 } = process.env;
 
 const parser = new argparse.ArgumentParser({
@@ -263,24 +260,24 @@ async function main() {
     },
     {
       template: resolve(base, 'drumee-rc/server-team/.dev-tools.rc/devel.sh'),
-      outfile: resolve(src_dir, 'drumee-os/server-team/.dev-tools.rc/devel.sh')
+      outfile: resolve(src_dir, 'drumee-os/tmp/server-team/.dev-tools.rc/devel.sh')
     },
     {
       template: resolve(base, 'drumee-rc/server-team/.dev-tools.rc/deploy.sh'),
-      outfile: resolve(src_dir, 'drumee-os/server-team/.dev-tools.rc/deploy.sh')
+      outfile: resolve(src_dir, 'drumee-os/tmp/server-team/.dev-tools.rc/deploy.sh')
     },
     {
       template: resolve(base, 'drumee-rc/ui-team/.dev-tools.rc/devel.sh'),
-      outfile: resolve(src_dir, 'drumee-os/ui-team/.dev-tools.rc/devel.sh')
+      outfile: resolve(src_dir, 'drumee-os/tmp/ui-team/.dev-tools.rc/devel.sh')
     },
     {
       template: resolve(base, 'drumee-rc/ui-team/.dev-tools.rc/deploy.sh'),
-      outfile: resolve(src_dir, 'drumee-os/ui-team/.dev-tools.rc/deploy.sh')
+      outfile: resolve(src_dir, 'drumee-os/tmp/ui-team/.dev-tools.rc/deploy.sh')
     },
-    // {
-    //   template: resolve(base, 'container.d/start'),
-    //   outfile: resolve(src_dir, 'container.d/start')
-    // },
+    {
+      template: resolve(base, 'docker.d/configure'),
+      outfile: resolve(src_dir, 'docker.d/configure')
+    },
   ]
   writeTemplates(data, opt)
 }

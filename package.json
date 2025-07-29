@@ -3,10 +3,16 @@
   "version": "0.0.0",
   "description": "Drumee Delevopers Starter Kit",
   "scripts": {
-    "preinstall": "cd configure && npm i && npm update",
-    "configure": "node configure --http-port=8080 --https-port=4443 && chmod +x setup && ./setup",
-    "log.service":"docker exec -it starter-kit pm2 log main/service",
-    "log.page":"docker exec -it starter-kit  pm2 log main"
+    "prepare.docker": "cd docker.d && npm i && npm update",
+    "prepare.configure": "cd configure && npm i && npm update",
+    "preinstall": "npm run prepare.docker && npm run prepare.configure",
+    "configure": "node configure --http-port=8080 --https-port=4443 --localhost=1 && chmod +x setup && ./setup",
+    "server.shell": "docker exec -it starter-kit bash",
+    "server.start": "docker exec -it starter-kit /var/lib/drumee/start.d/start",
+    "server.status": "docker exec -it starter-kit pm2 list",
+    "log.service": "docker exec -it starter-kit pm2 log main/service",
+    "log.main": "docker exec -it starter-kit pm2 log main",
+    "log.page": "docker exec -it starter-kit  pm2 log main"
   },
   "repository": {
     "type": "git",

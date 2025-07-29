@@ -13,6 +13,7 @@ services:
       - <%= src_dir %>/runtime:/var/lib/drumee/runtime
       - <%= src_dir %>/plugins:/var/lib/drumee/plugins
       - <%= src_dir %>/docker.d:/var/lib/drumee/start.d
+      - <%= src_dir %>/bin:/usr/share/drumee/bin:ro
       - <%= share_home %>
     entrypoint: /bin/bash 
     #entrypoint: /var/lib/drumee/start.d/start

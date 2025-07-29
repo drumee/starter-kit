@@ -1,5 +1,8 @@
 #!/bin/bash
 # This script in intended to run within container
+# DO NOT EDIT 
+# This file hase been automatically generated. Any changes my be lost upon new builds
+
 set -e
 script_dir=$(dirname $(readlink -f $0))
 envfile=/etc/drumee/drumee.sh
@@ -36,4 +39,4 @@ fi
 
 mkdir -p $DRUMEE_DB_DIR/run
 schemas/populate
-node schemas/index.js --http-port=8080  --https-port=4443 --localhost=1
+node schemas/index.js --http-port=<%= http_port %>  --https-port=<%= https_port %> --localhost=1
