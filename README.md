@@ -86,7 +86,8 @@ Get the Drumee Starter Kit, this project.
 After download completed, navigate into the starter-kit and run auto configuration
 
 ```
-  cd starter-kit 
+  cd starter-kit
+  npm i
   npm run configure
 ```
 
