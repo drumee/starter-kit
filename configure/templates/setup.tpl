@@ -19,23 +19,32 @@ for package in server-team ui-team; do
   fi
 done
 
-if [ -d $script_dir/drumee-os/tmp ]; then
-  cd $script_dir/drumee-os/server-team
-  mv ../tmp/server-team/.dev-tools.rc .
-  npm i && npm run deploy
-
-  cd $script_dir/drumee-os/ui-team
-  mv ../tmp/ui-team/.dev-tools.rc .
-  npm i && npm run deploy
-
-  rm -rf $script_dir/drumee-os/tmp
+# Install server part
+srv_tmp_rc=$script_dir/drumee-os/tmp/server-team/.dev-tools.rc
+srv_rc=$script_dir/drumee-os/server-team
+if [ -d $srv_tmp_rc ]; then
+  rsync -rav $srv_tmp_rc $srv_rc/
+  rm -rf $srv_tmp_rc
 fi
+cd $srv_rc && npm i && npm run deploy
+
+# Install UI part
+ui_tmp_rc=$script_dir/drumee-os/tmp/ui-team/.dev-tools.rc
+ui_rc=$script_dir/drumee-os/ui-team
+if [ -d $ui_tmp_rc ]; then
+  rsync -rav $ui_tmp_rc $ui_rc/
+  rm -rf $ui_tmp_rc
+fi
+
+cd $ui_rc && npm i && npm run deploy
+
 
 # Drumee Data directories
 mkdir -p <%= storage_dir %>/db
 mkdir -p <%= storage_dir %>/data
 mkdir -p <%= src_dir %>/runtime/static
 
+# Install server static files
 cd <%= src_dir %>/runtime
 if [ -d static/.git ]; then
   (cd static && git pull) 
