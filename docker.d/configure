@@ -1,5 +1,8 @@
 #!/bin/bash
 # This script in intended to run within container
+# DO NOT EDIT 
+# This file hase been automatically generated. Any changes my be lost upon new builds
+
 set -e
 script_dir=$(dirname $(readlink -f $0))
 envfile=/etc/drumee/drumee.sh

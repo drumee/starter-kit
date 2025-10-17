@@ -15,7 +15,7 @@ for package in server-team ui-team; do
   if [ -d $package/.git ]; then
     (cd $package && git pull) 
   else
-    git clone -b starter-kit https://github.com/drumee/$package.git
+    git clone -b main https://github.com/drumee/$package.git
   fi
 done
 
