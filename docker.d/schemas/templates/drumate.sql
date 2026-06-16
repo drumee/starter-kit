@@ -23747,6 +23747,12 @@ DECLARE _wicket_id VARCHAR(16);
       resource_id  VARCHAR(16) CHARACTER SET ascii,
       entity_id VARCHAR(16) CHARACTER SET ascii,
       hub_id VARCHAR(16) CHARACTER SET ascii,
+      nid VARCHAR(16) CHARACTER SET ascii,
+      parent_id VARCHAR(16) CHARACTER SET ascii,
+      filename VARCHAR(128),
+      filetype VARCHAR(16),
+      item_filetype VARCHAR(16),
+      last_id INT(11) UNSIGNED,
       ctime  INT(11) ,
       area  VARCHAR(16),
       category VARCHAR(16)
@@ -23756,7 +23762,7 @@ DECLARE _wicket_id VARCHAR(16);
    
    INSERT INTO _show_node
    SELECT 
-      ci.id  ,d.id ,_uid , mtime,'personal' ,'contact'
+      ci.id  ,d.id ,_uid , NULL, NULL, NULL, NULL, NULL, NULL, mtime,'personal' ,'contact'
    FROM 
    contact ci 
    INNER JOIN yp.drumate d ON d.id = ci.entity
@@ -23765,7 +23771,7 @@ DECLARE _wicket_id VARCHAR(16);
    
    INSERT INTO _show_node
    SELECT   
-      ch.message_id, ch.author_id , _uid ,ch.ctime , 'personal' , 'chat'   
+      ch.message_id, ch.author_id , _uid , NULL, NULL, NULL, NULL, NULL, NULL, ch.ctime , 'personal' , 'chat'
    FROM    
       channel ch    
    INNER JOIN read_channel rc ON ch.entity_id= rc.entity_id    
@@ -23791,15 +23797,15 @@ DECLARE _wicket_id VARCHAR(16);
 
       SET @sql=  CONCAT(
          "INSERT INTO _show_node
-         SELECT c.message_id,'", _nid ,"','",_nid, "' As hub_id ,c.ctime,'", _area, "','teamchat'  FROM ", _db_name ,".channel c WHERE
+         SELECT c.message_id,'", _nid ,"','",_nid, "' As hub_id ,NULL,NULL,NULL,NULL,NULL,NULL,c.ctime,'", _area, "','teamchat'  FROM ", _db_name ,".channel c WHERE
          c.sys_id > (SELECT  ref_sys_id FROM ", _db_name ,".read_channel WHERE uid ='", _uid ,"')" ) ;
       EXECUTE IMMEDIATE @sql;   
 
       SET @s = CONCAT(
           " INSERT INTO _show_node
-            SELECT id, '",_nid,"', '" , _nid , "', m.upload_time,'", _area ,"','media' FROM ", _db_name ,
-          ".media m WHERE file_path not REGEXP '^/__(chat|trash)__'  AND category != 'root' AND 
-            IFNULL((is_new(metadata, owner_id, ?)), 0) =1 "
+            SELECT m.id, m.owner_id, '" , _nid , "', target.id, target.parent_id, target.user_filename, 'folder', m.category, m.sys_id, m.upload_time,'", _area ,"','media' FROM ", _db_name ,
+          ".media m LEFT JOIN ", _db_name ,".media target ON target.id = IF(m.category = 'folder', m.id, m.parent_id) WHERE m.file_path not REGEXP '^/__(chat|trash)__'  AND m.category != 'root' AND
+            IFNULL((is_new(m.metadata, m.owner_id, ?)), 0) =1 "
         );
       PREPARE stmt FROM @s;
       EXECUTE stmt USING _uid;
@@ -23829,7 +23835,7 @@ DECLARE _wicket_id VARCHAR(16);
       SET @s = CONCAT("
             INSERT INTO _show_node
             SELECT 
-               t.ticket_id  , t.ticket_id , 'Support Ticket', c.ctime ,'personal','ticket'
+               t.ticket_id  , t.ticket_id , 'Support Ticket', NULL,NULL,NULL,NULL,NULL,NULL,c.ctime ,'personal','ticket'
             FROM 
                yp.ticket t  
             INNER JOIN ", _wicket_db_name ,". map_ticket mt  ON  mt.ticket_id = t.ticket_id 
@@ -23846,7 +23852,7 @@ DECLARE _wicket_id VARCHAR(16);
 
       INSERT INTO _show_node
       SELECT
-         t.ticket_id,  t.ticket_id ,'Support Ticket', c.ctime ,'personal','ticket'
+         t.ticket_id,  t.ticket_id ,'Support Ticket', NULL,NULL,NULL,NULL,NULL,NULL,c.ctime ,'personal','ticket'
       FROM 
          yp.ticket t 
       LEFT JOIN yp.read_ticket_channel rtc on rtc.ticket_id = t.ticket_id AND rtc.uid = _uid
@@ -23862,13 +23868,19 @@ DECLARE _wicket_id VARCHAR(16);
       d.id drumate_id,
       dmu.id guest_id,
       coalesce(c.id,  d.id,dmu.id,  CASE WHEN hub_id = 'Support Ticket' THEN entity_id ELSE hub_id END  ) key_id,
-      coalesce(c.firstname, d.lastname, dmu.email) firstname,  
+      coalesce(c.firstname, d.firstname, dmu.email) firstname,
       coalesce(c.lastname, d.lastname, dmu.email) lastname,
       IF ( hub_id <>'Support Ticket' , (coalesce( IFNULL(c.surname,IF(coalesce(c.firstname, c.lastname) IS NULL,coalesce(ce.email,d.email,dmu.email),
       CONCAT( IFNULL(c.firstname, '') ,' ',  IFNULL(c.lastname, '')))) ,  h.name )), entity_id  )surname,
       coalesce(ce.email,d.email,dmu.email) email,
       c.status status,
       b.hub_id hub_id,
+      b.nid,
+      b.parent_id,
+      b.filename,
+      b.filetype,
+      b.item_filetype,
+      b.last_id,
       
       b.ctime,
       b.category,
@@ -23880,9 +23892,15 @@ DECLARE _wicket_id VARCHAR(16);
       WHERE mt.id = coalesce(c.id,  d.id,dmu.id,  CASE WHEN hub_id = 'Support Ticket' THEN entity_id ELSE hub_id END  )) as tag_id
    FROM 
    (SELECT 
-      count(1) cnt ,entity_id,hub_id,category,max(ctime) ctime ,area  
+      count(1) cnt ,entity_id,hub_id,category,max(ctime) ctime ,area,
+      nid,
+      MAX(parent_id) parent_id,
+      MAX(filename) filename,
+      MAX(filetype) filetype,
+      MAX(item_filetype) item_filetype,
+      MAX(last_id) last_id
    FROM  _show_node 
-   GROUP BY entity_id,hub_id,category,area ) b 
+   GROUP BY entity_id,hub_id,category,area,nid ) b
    
    LEFT JOIN yp.hub h ON h.id = b.hub_id   
    LEFT JOIN yp.dmz_user dmu ON b.entity_id = dmu.id
@@ -28390,4 +28408,3 @@ DELIMITER ;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
